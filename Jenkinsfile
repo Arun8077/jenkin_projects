@@ -1,49 +1,12 @@
 pipeline {
+    agent any
 
-  environment {
-    dockerimagename = "8077103273/nodeapp"
-    dockerImage = ""
-  }
-
-  agent any
-
-  stages {
-
-    stage('Checkout Source') {
-      steps {
-        git 'https://github.com/shazforiot/nodeapp_test.git'
-      }
-    }
-
-    stage('Build image') {
-      steps{
-        script {
-          dockerImage = docker.build dockerimagename
+    stages {
+        stage('Run Shell Command') {
+            steps {
+                // Replace this with any shell command you want
+                sh 'echo "Hello from Jenkins!"'
+            }
         }
-      }
     }
-
-    stage('Pushing Image') {
-      environment {
-               registryCredential = 'dockerhub'
-           }
-      steps{
-        script {
-          docker.withRegistry( 'https://registry.hub.docker.com', registryCredential ) {
-            dockerImage.push("latest")
-          }
-        }
-      }
-    }
-
-    stage('Deploying App to Kubernetes') {
-      steps {
-        script {
-          kubernetesDeploy(configs: "deploymentservice.yml", kubeconfigId: "kubernetes")
-        }
-      }
-    }
-
-  }
-
 }
